@@ -8,42 +8,46 @@ description: >-
 
 > 웹캠 영상인식(YOLO/mediapipe) 연동 작업 시 이 스킬을 참고한다.
 
-## 패키지 설치 (Windows 주의)
-Windows 기본 경로 길이 제한(260자)과 최신 NumPy 2.x·PyTorch 바이너리 충돌로
-`pip install ultralytics`가 `[WinError 206] 파일 이름이나 확장명이 너무 깁니다`로
-실패할 수 있다. 아래처럼 버전을 고정해서 설치한다.
+## 패키지 설치 (Windows 안정화 표준)
+Windows 환경에서 Python 3.14/3.13 설치 시 발생하는 C-확장 모듈 DLL 로드 에러(`[WinError 1114]`)를 방지하고, 
+2GB 상당의 무거운 PyTorch와 Windows 긴 경로 에러(`[WinError 206]`)를 원천 차단하기 위해 
+**`py -3.12` 가상환경** 및 **Native OpenCV DNN (`yolov8n.onnx`)** 방식을 사용한다.
+`.gitignore` 호환을 위해 가상환경 폴더명은 반드시 `venv`로 통일한다.
+
 ```powershell
 cd vision
-python -m venv venv
+# Python 3.12 가상환경 생성 (3.12 미설치 시 python -m venv venv)
+py -3.12 -m venv venv
 .\venv\Scripts\Activate.ps1
-# 1. 경로 에러가 없는 경량 CPU PyTorch 설치
-pip install torch==2.2.2+cpu torchvision==0.17.2+cpu --extra-index-url https://download.pytorch.org/whl/cpu
-# 2. 호환 패키지 설치
-pip install "numpy<2" opencv-python==4.9.0.80 ultralytics requests python-dotenv
-```
-그래도 경로 에러가 나면 관리자 권한 PowerShell에서 Windows 긴 경로 제한을 아예
-해제한다(FAQ 참고):
-```powershell
-New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+
+# 경량 패키지 설치 (OpenCV, NumPy, Pillow, Requests - 약 50MB, 10초 내 완료)
+pip install -r requirements.txt
 ```
 
-## 최소 파이프라인 (YOLOv8n 예시 — 실제 검증된 조합)
-사람 감지처럼 "특정 인물 식별이 아닌 사람/사물 존재 여부"에는 mediapipe의
-얼굴 감지보다 YOLOv8n(경량 객체 감지 모델)이 더 적합하고 실제로도 검증됐다.
+## 최소 파이프라인 (Native OpenCV DNN + YOLOv8 ONNX 조합)
+PyTorch 의존성 없이 순수 OpenCV DNN으로 `yolov8n.onnx`를 로드하여 객차 내 사람(class 0)을 탐지한다.
+웹캠 한글 깨짐 방지 및 라벨링을 위해 `PIL(Pillow)`을 활용할 수 있다.
+
 ```python
 import cv2
-from ultralytics import YOLO
+import numpy as np
 
-model = YOLO("yolov8n.pt")
+# OpenCV DNN으로 ONNX 모델 로드 (PyTorch/c10.dll 불필요)
+net = cv2.dnn.readNetFromONNX("yolov8n.onnx")
+net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
+net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # Windows에서는 CAP_DSHOW로 열어야 웹캠 인식이 안정적
 
 while True:
     ok, frame = cap.read()
     if not ok:
         continue
-    results = model(frame, classes=[0], verbose=False)  # class 0 = person
-    detected = len(results[0].boxes) > 0
-    # 상태가 바뀔 때만 이벤트 전송 (vision-rules.md 참고)
+    # 640x640 blob 변환 후 추론
+    blob = cv2.dnn.blobFromImage(frame, 1/255.0, (640, 640), swapRB=True, crop=False)
+    net.setInput(blob)
+    preds = net.forward()
+    # 인원수 판별 후 백엔드 전송 (vision/main.py 참고)
 ```
 
 <details>
