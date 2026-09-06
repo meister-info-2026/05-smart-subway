@@ -1,0 +1,12 @@
+# Raspberry Pi 5 Daemon Dependencies
+
+# REST API communication & environment variables
+requests>=2.31.0
+python-dotenv>=1.0.1
+
+# ------------------------------------------------------------------------------
+# Future Hardware Integration (Raspberry Pi 5 physical GPIO)
+# Note: Install these when wiring real physical hardware components.
+# gpiozero>=2.0.1
+# lgpio>=0.2.2.0  # Required for Raspberry Pi 5 RP1 chipset
+# ------------------------------------------------------------------------------
