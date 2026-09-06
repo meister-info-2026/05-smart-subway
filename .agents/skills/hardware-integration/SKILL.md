@@ -45,12 +45,24 @@ led.off()  # 끄기
 
 ## 라즈베리파이 5 패키지 설치 (Pi 5 전용 주의)
 라즈베리파이 5는 GPIO 칩이 이전 모델과 달라(RP1), 예전 방식(`RPi.GPIO`)이 아니라
-`lgpio` 핀 팩토리가 필요하다. `gpiozero`만 설치하면 핀 제어가 실패할 수 있다.
+`lgpio` 핀 팩토리가 필수적이다.
+**주의**: PyPI에서 `pip install lgpio`를 시도하면 C 컴파일 빌드 에러가 발생하므로,
+라즈베리파이 OS 기본 APT 패키지를 설치한 후 `--system-site-packages` 가상환경을 생성해야 한다.
+
 ```bash
+# 1. 시스템 APT 패키지 설치 (lgpio C 빌드 오류 원천 차단)
+sudo apt update && sudo apt install -y python3-gpiozero python3-lgpio
+
+# 2. 가상환경 생성 (--system-site-packages로 시스템의 lgpio 상속)
 cd pi
-python3 -m venv venv
+python3 -m venv --system-site-packages venv
 source venv/bin/activate
-pip install gpiozero lgpio requests python-dotenv
+
+# 3. 경량 Python 패키지 설치
+pip install -r requirements.txt  # requests, python-dotenv
+
+# 4. 하드웨어 1분 자가진단 (배선 및 RP1 칩셋 검증)
+python test_hardware_gpio.py
 ```
 
 ## desired-state 폴링 패턴

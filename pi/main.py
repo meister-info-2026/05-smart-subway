@@ -11,6 +11,10 @@
 - 하드웨어 확장:
     추후 실제 부품(LED, 모터, 센서) 배선 시 각 Virtual 컨트롤러 클래스 내부의
     주석 처리된 gpiozero 코드를 활성화하면 100% 실기기로 즉시 전환됩니다.
+- [필독] 라즈베리파이 5(RP1 칩셋) 주의사항:
+    PyPI에서 pip install lgpio 시 C 컴파일 에러가 나므로, 반드시 시스템 APT 패키지
+    (sudo apt install -y python3-gpiozero python3-lgpio) 설치 후,
+    `python3 -m venv --system-site-packages venv` 가상환경에서 실행하세요.
 ==============================================================================
 """
 
@@ -57,6 +61,9 @@ except ImportError:
                 if line and not line.startswith("#") and "=" in line:
                     k, v = line.split("=", 1)
                     os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+
+# 라즈베리파이 5 RP1 칩셋 전용 GPIOZERO Pin Factory 기본값 보장
+os.environ.setdefault("GPIOZERO_PIN_FACTORY", "lgpio")
 
 
 # ==============================================================================
