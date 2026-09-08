@@ -1,23 +1,24 @@
+# -*- coding: utf-8 -*-
 # ==============================================================================
-# Vision Client Requirements (지하철 혼잡도 AI 실시간 분석 클라이언트)
+# Vision Client Requirements (Subway Congestion AI Real-time Analysis)
 # ==============================================================================
-# 💡 학생 및 전시회 배포 표준: Native OpenCV DNN + YOLOv8 ONNX 구동
-# - 가상환경 생성 권장: py -3.12 -m venv venv (.gitignore 호환 및 Python 3.14 DLL 에러 방지)
-# - 2GB 상당의 무거운 PyTorch 및 Windows c10.dll 에러를 원천 차단했습니다.
-# - 설치 용량이 50MB로 대폭 경량화되어 학내 네트워크 부담 없이 10초 내 설치 완료됩니다.
+# Standard: Native OpenCV DNN + YOLOv8 ONNX execution
+# - Recommended venv: py -3.12 -m venv venv
+# - Lightweight installation (~50MB), avoids heavy PyTorch and Windows c10.dll errors
 # ==============================================================================
 
-# 핵심 컴퓨터 비전 및 딥러닝 추론 엔진 (OpenCV DNN 내장)
+# Core computer vision and deep learning inference engine (OpenCV DNN)
 opencv-python>=4.9.0.80
 
-# 고속 텐서 행렬 연산
+# Fast tensor matrix operations
 numpy>=1.24.0
 
-# 웹캠 화면 한글 폰트 렌더링 지원 (한글 깨짐 방지)
+# Korean font rendering on webcam frames
 pillow>=10.0.0
 
-# 백엔드(FastAPI) 실시간 이벤트 전송용 HTTP 클라이언트
+# HTTP client for FastAPI backend event transmission
 requests>=2.31.0
 
-# 환경변수(.env) 로드
+# Environment variables loader (.env)
 python-dotenv>=1.0.0
+

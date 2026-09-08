@@ -1,24 +1,18 @@
+# -*- coding: utf-8 -*-
 # Raspberry Pi 5 Daemon Dependencies
-
 # ------------------------------------------------------------------------------
-# [필독] 라즈베리파이 5 (RP1 칩셋) 하드웨어 패키지 설치 표준
-# ------------------------------------------------------------------------------
-# 라즈베리파이 5는 RP1 칩셋 특성상 PyPI에서 `pip install lgpio`를 시도하면
-# C 컴파일 빌드 오류가 발생합니다. 반드시 OS 기본 APT 패키지를 설치한 후,
-# `--system-site-packages` 옵션으로 가상환경을 생성하여 사용하세요.
-#
-# 1) 시스템 APT 패키지 설치:
+# Raspberry Pi 5 (RP1) hardware package installation note:
+# 1) Install system APT packages:
 #    sudo apt update && sudo apt install -y python3-gpiozero python3-lgpio
-#
-# 2) 가상환경 생성 (시스템 패키지 상속):
+# 2) Create virtual environment with system packages inherited:
 #    cd pi
 #    python3 -m venv --system-site-packages venv
 #    source venv/bin/activate
-#
-# 3) 가상환경 내 필수 의존성 설치:
+# 3) Install requirements:
 #    pip install -r requirements.txt
 # ------------------------------------------------------------------------------
 
 # REST API communication & environment variables
 requests>=2.31.0
 python-dotenv>=1.0.1
+
